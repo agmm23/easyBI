@@ -3,15 +3,16 @@ import { LayoutDashboard, Settings, Sparkles, BarChart3 } from 'lucide-react';
 import { Dashboard } from './components/Dashboard';
 import { Configuration } from './components/Configuration';
 import { GeminiInsights } from './components/GeminiInsights';
-import { INITIAL_DATA_SOURCES } from './constants';
-import { DataSource, WidgetConfig, ChartType } from './types';
+import { INITIAL_DATA_SOURCES, INITIAL_SECTIONS } from './constants';
+import { DataSource, WidgetConfig, ChartType, DashboardSection } from './types';
 
-// Initial widgets setup
+// Initial widgets setup linked to sections
 const INITIAL_WIDGETS: WidgetConfig[] = [
   {
     id: 'w-001',
     title: 'Tendencia de Ventas y Beneficios',
     sourceId: 'src-001',
+    sectionId: 'sec-finance',
     chartType: ChartType.AREA,
     xAxisKey: 'month',
     dataKeys: ['sales', 'profit']
@@ -20,6 +21,7 @@ const INITIAL_WIDGETS: WidgetConfig[] = [
     id: 'w-002',
     title: 'Distribución de Ventas',
     sourceId: 'src-001',
+    sectionId: 'sec-general',
     chartType: ChartType.PIE,
     xAxisKey: 'month',
     dataKeys: ['sales']
@@ -28,6 +30,7 @@ const INITIAL_WIDGETS: WidgetConfig[] = [
     id: 'w-003',
     title: 'Valor de Inventario por Categoría',
     sourceId: 'src-002',
+    sectionId: 'sec-inventory',
     chartType: ChartType.BAR,
     xAxisKey: 'category',
     dataKeys: ['value']
@@ -38,6 +41,7 @@ function App() {
   const [currentView, setCurrentView] = useState<'dashboard' | 'config' | 'insights'>('dashboard');
   const [dataSources, setDataSources] = useState<DataSource[]>(INITIAL_DATA_SOURCES);
   const [widgets, setWidgets] = useState<WidgetConfig[]>(INITIAL_WIDGETS);
+  const [sections, setSections] = useState<DashboardSection[]>(INITIAL_SECTIONS);
 
   const handleAddDataSource = (newSource: DataSource) => {
     setDataSources([...dataSources, newSource]);
@@ -55,6 +59,17 @@ function App() {
 
   const handleDeleteWidget = (id: string) => {
     setWidgets(widgets.filter(w => w.id !== id));
+  };
+
+  const handleAddSection = (newSection: DashboardSection) => {
+    setSections([...sections, newSection]);
+  };
+
+  const handleDeleteSection = (id: string) => {
+    setSections(sections.filter(s => s.id !== id));
+    // Remove widgets associated with deleted section or move them to default?
+    // For simplicity, we remove them
+    setWidgets(widgets.filter(w => w.sectionId !== id));
   };
 
   return (
@@ -144,6 +159,7 @@ function App() {
             <Dashboard 
               widgets={widgets} 
               dataSources={dataSources} 
+              sections={sections}
               onAddWidget={() => setCurrentView('config')} 
             />
           )}
@@ -151,10 +167,13 @@ function App() {
             <Configuration 
               dataSources={dataSources}
               widgets={widgets}
+              sections={sections}
               onAddDataSource={handleAddDataSource}
               onDeleteDataSource={handleDeleteDataSource}
               onAddWidget={handleAddWidget}
               onDeleteWidget={handleDeleteWidget}
+              onAddSection={handleAddSection}
+              onDeleteSection={handleDeleteSection}
             />
           )}
           {currentView === 'insights' && (

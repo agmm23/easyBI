@@ -1,23 +1,34 @@
+
 import React from 'react';
 import { 
   LineChart, Line, BarChart, Bar, PieChart, Pie, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell 
 } from 'recharts';
-import { ChartType, WidgetConfig, DataSource } from '../../types';
+import { ChartType, WidgetConfig, DataSource, DataPoint } from '../../types';
 
 interface ChartRendererProps {
   config: WidgetConfig;
   dataSource?: DataSource;
+  filteredData?: DataPoint[]; // Allow passing pre-filtered data
 }
 
 const COLORS = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
-export const ChartRenderer: React.FC<ChartRendererProps> = ({ config, dataSource }) => {
+export const ChartRenderer: React.FC<ChartRendererProps> = ({ config, dataSource, filteredData }) => {
   if (!dataSource) {
     return <div className="flex items-center justify-center h-full text-gray-400">Fuente de datos no encontrada</div>;
   }
 
-  const data = dataSource.data;
+  // Use filteredData if provided, otherwise fallback to full source data
+  const data = filteredData || dataSource.data;
+
+  if (data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full text-gray-400 text-sm text-center px-4">
+        No hay datos para el rango de fecha seleccionado
+      </div>
+    );
+  }
 
   const renderChart = () => {
     switch (config.chartType) {
