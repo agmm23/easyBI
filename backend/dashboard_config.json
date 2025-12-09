@@ -1,0 +1,35 @@
+[
+  {
+    "id": "9f748bad-0c55-44fc-aab7-e3283e6f86a6",
+    "title": "sales",
+    "charts": [
+      {
+        "title": "asdasd",
+        "datasource_id": "79a43527-b322-477c-b70f-ce4d55e789a4",
+        "chart_type": "bar",
+        "x_column": "Date",
+        "y_column": "Total Revenue",
+        "date_column": "Date",
+        "id": "02932d60-caef-4c36-bb6c-49d1ed81d25e"
+      },
+      {
+        "title": "fwe",
+        "datasource_id": "79a43527-b322-477c-b70f-ce4d55e789a4",
+        "chart_type": "bar",
+        "x_column": "Date",
+        "y_column": "Total Revenue",
+        "date_column": "Date",
+        "id": "471a200e-04d1-4677-9f88-eb622177f25a"
+      },
+      {
+        "title": "qwe",
+        "datasource_id": "79a43527-b322-477c-b70f-ce4d55e789a4",
+        "chart_type": "area",
+        "x_column": "Date",
+        "y_column": "Total Revenue",
+        "date_column": "Date",
+        "id": "0e3807ea-bdb0-47a4-b23c-65a941410793"
+      }
+    ]
+  }
+]

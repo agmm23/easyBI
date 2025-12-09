@@ -1,0 +1,31 @@
+# Frontend - Node
+node_modules/
+dist/
+.env.local
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Backend - Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+
+# System
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Project Specific
+# (Optional) If you don't want to commit the actual uploaded data files, uncomment below:
+# backend/datasources/*.csv
+# backend/datasources/*.xlsx
+# But we will keep them by default for your backup unless huge.
