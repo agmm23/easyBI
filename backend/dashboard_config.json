@@ -4,13 +4,13 @@
     "title": "sales",
     "charts": [
       {
-        "title": "sales",
-        "datasource_id": "c8321795-d804-4c06-9187-85849503daf3",
-        "chart_type": "bar",
+        "title": "googlt",
+        "datasource_id": "944b5b02-d989-4a43-9499-cc144a3050a7",
+        "chart_type": "area",
         "x_column": "Date",
-        "y_column": "Total Revenue",
-        "date_column": "Date",
-        "id": "50570a1f-63b1-4a81-a2f3-e6fecbcf0a35"
+        "y_column": "Units Sold",
+        "date_column": "",
+        "id": "1f1eed38-033e-413e-945a-535af763644b"
       }
     ]
   }

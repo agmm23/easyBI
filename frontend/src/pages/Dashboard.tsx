@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardChart } from '../components/DashboardChart';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { PlusCircle, Calendar } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { useDashboard } from '../contexts/DashboardContext';
 
 export function Dashboard() {
@@ -9,9 +9,67 @@ export function Dashboard() {
     const navigate = useNavigate();
     const { sections } = useDashboard();
 
-    // Date Filter State
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
+    // Date Range State
+    const [selectedRange, setSelectedRange] = useState('all');
+    const [customStart, setCustomStart] = useState('');
+    const [customEnd, setCustomEnd] = useState('');
+
+    const handleRangeChange = (range: string) => {
+        setSelectedRange(range);
+        if (range !== 'custom') {
+            setCustomStart('');
+            setCustomEnd('');
+        }
+    };
+
+    const handleCustomDateChange = (type: 'start' | 'end', value: string) => {
+        if (type === 'start') setCustomStart(value);
+        else setCustomEnd(value);
+
+        setSelectedRange('custom');
+    };
+
+    const calculateDateRange = (range: string) => {
+        if (range === 'custom') {
+            return { start: customStart, end: customEnd };
+        }
+
+        const end = new Date();
+        const start = new Date();
+
+
+        switch (range) {
+            case 'last_week':
+                start.setDate(end.getDate() - 7);
+                break;
+            case 'last_month':
+                start.setDate(end.getDate() - 30);
+                break;
+            case 'last_3_months':
+                start.setDate(end.getDate() - 90);
+                break;
+            case 'last_6_months':
+                start.setDate(end.getDate() - 180);
+                break;
+            case 'last_year':
+                start.setDate(end.getDate() - 365);
+                break;
+            case 'ytd':
+                start.setMonth(0, 1); // Jan 1st of current year
+                break;
+            case 'all':
+            default:
+                return { start: '', end: '' };
+        }
+
+        return {
+            start: start.toISOString().split('T')[0],
+            end: end.toISOString().split('T')[0]
+        };
+    };
+
+    const { start: startDate, end: endDate } = calculateDateRange(selectedRange);
+
 
     // Grouping State
     const [timeGrouping, setTimeGrouping] = useState('day');
@@ -86,35 +144,52 @@ export function Dashboard() {
                         </select>
                     </div>
 
-                    {/* Date Pickers */}
-                    <div className="flex items-center space-x-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
-                        <Calendar className="w-5 h-5 text-gray-400 ml-2" />
-                        <div className="flex items-center space-x-2">
-                            <input
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
-                                placeholder="Start Date"
-                            />
-                            <span className="text-gray-300">to</span>
-                            <input
-                                type="date"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
-                                placeholder="End Date"
-                            />
-                        </div>
-                        {(startDate || endDate) && (
-                            <button
-                                onClick={() => { setStartDate(''); setEndDate(''); }}
-                                className="text-xs text-red-500 hover:text-red-700 px-2 font-medium"
-                            >
-                                Clear
-                            </button>
-                        )}
+                    {/* Date Range Selector */}
+                    <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date Range:</label>
+                        <select
+                            value={selectedRange}
+                            onChange={(e) => handleRangeChange(e.target.value)}
+                            className="text-sm font-medium text-gray-700 bg-transparent border-none focus:ring-0 cursor-pointer outline-none"
+                        >
+                            <option value="all">All Time</option>
+                            <option value="last_week">Last Week</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="last_3_months">Last 3 Months</option>
+                            <option value="last_6_months">Last 6 Months</option>
+                            <option value="last_year">Last Year</option>
+                            <option value="ytd">Year to Date</option>
+                            <option value="custom">Custom</option>
+                        </select>
                     </div>
+
+                    {/* Custom Date Inputs */}
+                    <div className="flex items-center space-x-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm animate-in fade-in duration-200">
+                        <input
+                            type="date"
+                            value={customStart}
+                            onChange={(e) => handleCustomDateChange('start', e.target.value)}
+                            className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
+                            placeholder="Start Date"
+                        />
+                        <span className="text-gray-300">to</span>
+                        <input
+                            type="date"
+                            value={customEnd}
+                            onChange={(e) => handleCustomDateChange('end', e.target.value)}
+                            className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
+                            placeholder="End Date"
+                        />
+                        <button
+                            onClick={() => handleRangeChange('all')}
+                            className="text-xs text-red-500 hover:text-red-700 px-2 font-medium"
+                        >
+                            Clear
+                        </button>
+                    </div>
+
+
+
                 </div>
             </div>
 
@@ -126,9 +201,9 @@ export function Dashboard() {
                                 <DashboardChart
                                     key={chart.id}
                                     chart={chart}
+                                    timeGrouping={timeGrouping}
                                     startDate={startDate}
                                     endDate={endDate}
-                                    timeGrouping={timeGrouping}
                                 />
                             ))
                         ) : (

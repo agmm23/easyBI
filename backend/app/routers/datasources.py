@@ -12,16 +12,22 @@ class DataSource(BaseModel):
     id: str
     name: str
     description: Optional[str] = None
-    type: str # 'csv', 'excel', 'database'
-    path: str
+    type: str # 'csv', 'excel', 'database', 'google_sheets'
+    path: str # File path or URL
     columns: List[str]
 
+
 class DataSourceCreate(BaseModel):
+
     name: str
     description: Optional[str] = None
     type: str
     path: str
     columns: List[str]
+
+class PreviewURLRequest(BaseModel):
+    url: str
+    type: str = "google_sheets"
 
 def load_db():
     if not os.path.exists(DB_FILE):
@@ -62,6 +68,16 @@ def delete_datasource(id: str):
 from app.services.data_processing import process_file, get_full_data
 import pandas as pd
 
+@router.post("/preview-url")
+def preview_url_datasource(request: PreviewURLRequest):
+    try:
+        preview = process_file(request.url)
+        return {"preview": preview, "url": request.url}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing URL: {str(e)}")
+
 @router.get("/{id}/data")
 def get_datasource_data(id: str, 
                         start_date: Optional[str] = None, 
@@ -80,9 +96,9 @@ def get_datasource_data(id: str,
         # always use get_full_data now to ensure we have the DF for filtering/sorting
         df = get_full_data(ds["path"])
         
-        # Date Filtering Logic
-        if date_column and start_date and end_date and date_column in df.columns:
-            print(f"--- FILTER DEBUG START ---")
+        if date_column and (start_date or end_date) and date_column in df.columns:
+            # print(f"--- FILTER DEBUG START ---") # Cleaning up old print too if desired, or keeping it
+
             print(f"Filtering column '{date_column}'")
             print(f"Range: {start_date} to {end_date}")
             print(f"Sample data BEFORE conversion (first 5): {df[date_column].astype(str).head(5).tolist()}")
@@ -96,25 +112,28 @@ def get_datasource_data(id: str,
             # Check for NaTs
             nat_count = df[date_column].isna().sum()
             if nat_count > 0:
-                 print(f"WARNING: {nat_count} rows could not be converted to dates and became NaT (Not a Time).")
+                print(f"WARNING: {nat_count} rows could not be converted to dates and became NaT (Not a Time).")
             
             try:
                 # Fix: Make end_date include the full day (up to 23:59:59.999)
-                start_dt = pd.to_datetime(start_date)
-                end_dt = pd.to_datetime(end_date) + pd.Timedelta(days=1)
+                # If start_date is missing, default to min date
+                start_dt = pd.to_datetime(start_date) if start_date else pd.Timestamp.min
+                # If end_date is missing, default to max date
+                end_dt = pd.to_datetime(end_date) + pd.Timedelta(days=1) if end_date else pd.Timestamp.max
                 
                 print(f"Filter Interval: [{start_dt}] to strictly less than [{end_dt}]")
                 
                 mask = (df[date_column] >= start_dt) & (df[date_column] < end_dt)
                 df = df.loc[mask]
                 print(f"Rows remaining: {len(df)}")
+
             except Exception as e:
                 print(f"Date conversion error (out of bounds or invalid): {e}")
                 # If dates are invalid (e.g. year 0002 while typing), we can either return empty or all data.
                 # Returning empty avoids showing misleading data.
                 return {"columns": df.columns.tolist(), "rows": []}
 
-            print(f"--- FILTER DEBUG END ---")
+            # print(f"--- FILTER DEBUG END ---")
 
         # Aggregation Logic
         if x_column and y_column and x_column in df.columns and y_column in df.columns:

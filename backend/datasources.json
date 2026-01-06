@@ -14,5 +14,21 @@
       "Total Revenue"
     ],
     "id": "c8321795-d804-4c06-9187-85849503daf3"
+  },
+  {
+    "name": "Google Sheet Data",
+    "description": "Imported from Public Google Sheet",
+    "type": "google_sheets",
+    "path": "https://docs.google.com/spreadsheets/d/1xOS1vsswke-ABHJ2O3m_OrHyn8-g4121WodatT1XBt0/edit?usp=sharing",
+    "columns": [
+      "Date",
+      "Product",
+      "Branch",
+      "Region",
+      "Units Sold",
+      "Unit Price",
+      "Total Revenue"
+    ],
+    "id": "944b5b02-d989-4a43-9499-cc144a3050a7"
   }
 ]

@@ -3,22 +3,30 @@ import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, Cartesia
 
 interface DashboardChartProps {
     chart: any;
+    timeGrouping?: string;
     startDate?: string;
     endDate?: string;
-    timeGrouping?: string;
 }
 
-export function DashboardChart({ chart, startDate, endDate, timeGrouping }: DashboardChartProps) {
+export function DashboardChart({ chart, timeGrouping, startDate, endDate }: DashboardChartProps) {
+
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         let url = `http://localhost:8000/api/datasources/${chart.datasource_id}/data?sort_by=${chart.x_column}&x_column=${chart.x_column}&y_column=${chart.y_column}&group_by=${timeGrouping || 'day'}`;
 
-        // Add date filtering params if valid range and chart has date_column configured
-        if (chart.date_column && startDate && endDate) {
-            url += `&start_date=${startDate}&end_date=${endDate}&date_column=${chart.date_column}`;
+        // If date_column is not set, try to use x_column if it seems to be a date-based chart
+        // This is a common convention in this app where the X axis for time series IS the date column
+        const dateColumn = chart.date_column || chart.x_column;
+
+        if (dateColumn && (startDate || endDate)) {
+            url += `&date_column=${dateColumn}`;
+            if (startDate) url += `&start_date=${startDate}`;
+            if (endDate) url += `&end_date=${endDate}`;
         }
+
+
 
         setLoading(true);
         fetch(url)
@@ -26,7 +34,8 @@ export function DashboardChart({ chart, startDate, endDate, timeGrouping }: Dash
             .then(data => setData(data))
             .catch(err => console.error(err))
             .finally(() => setLoading(false));
-    }, [chart.datasource_id, chart.date_column, startDate, endDate, timeGrouping]);
+    }, [chart.datasource_id, chart.date_column, chart.x_column, timeGrouping, startDate, endDate]);
+
 
     if (loading) return <div className="h-[300px] flex items-center justify-center text-gray-400 bg-gray-50 rounded-xl">Loading...</div>;
     if (!data) return <div className="h-[300px] flex items-center justify-center text-red-400 bg-red-50 rounded-xl">Error loading data</div>;
