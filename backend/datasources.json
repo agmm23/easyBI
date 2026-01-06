@@ -1,17 +1,18 @@
 [
   {
     "name": "sales_data",
-    "description": "asdasd",
+    "description": "",
     "type": "csv",
     "path": "uploads/sales_data.xlsx",
     "columns": [
       "Date",
       "Product",
+      "Branch",
       "Region",
       "Units Sold",
       "Unit Price",
       "Total Revenue"
     ],
-    "id": "79a43527-b322-477c-b70f-ce4d55e789a4"
+    "id": "c8321795-d804-4c06-9187-85849503daf3"
   }
 ]

@@ -13,6 +13,9 @@ export function Dashboard() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
+    // Grouping State
+    const [timeGrouping, setTimeGrouping] = useState('day');
+
     // Redirect to first section if no ID provided and sections exist
     useEffect(() => {
         if (!sectionId && sections.length > 0) {
@@ -67,34 +70,51 @@ export function Dashboard() {
                     </p>
                 </div>
 
-                {/* Date Filter Controls */}
-                <div className="flex items-center space-x-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
-                    <Calendar className="w-5 h-5 text-gray-400 ml-2" />
-                    <div className="flex items-center space-x-2">
-                        <input
-                            type="date"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
-                            placeholder="Start Date"
-                        />
-                        <span className="text-gray-300">to</span>
-                        <input
-                            type="date"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
-                            placeholder="End Date"
-                        />
-                    </div>
-                    {(startDate || endDate) && (
-                        <button
-                            onClick={() => { setStartDate(''); setEndDate(''); }}
-                            className="text-xs text-red-500 hover:text-red-700 px-2 font-medium"
+                {/* Filter Controls */}
+                <div className="flex flex-wrap items-center gap-3">
+                    {/* Group By Selector */}
+                    <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Group By:</label>
+                        <select
+                            value={timeGrouping}
+                            onChange={(e) => setTimeGrouping(e.target.value)}
+                            className="text-sm font-medium text-gray-700 bg-transparent border-none focus:ring-0 cursor-pointer outline-none"
                         >
-                            Clear
-                        </button>
-                    )}
+                            <option value="day">Day</option>
+                            <option value="week">Week</option>
+                            <option value="month">Month</option>
+                        </select>
+                    </div>
+
+                    {/* Date Pickers */}
+                    <div className="flex items-center space-x-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
+                        <Calendar className="w-5 h-5 text-gray-400 ml-2" />
+                        <div className="flex items-center space-x-2">
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
+                                placeholder="Start Date"
+                            />
+                            <span className="text-gray-300">to</span>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
+                                placeholder="End Date"
+                            />
+                        </div>
+                        {(startDate || endDate) && (
+                            <button
+                                onClick={() => { setStartDate(''); setEndDate(''); }}
+                                className="text-xs text-red-500 hover:text-red-700 px-2 font-medium"
+                            >
+                                Clear
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -108,6 +128,7 @@ export function Dashboard() {
                                     chart={chart}
                                     startDate={startDate}
                                     endDate={endDate}
+                                    timeGrouping={timeGrouping}
                                 />
                             ))
                         ) : (

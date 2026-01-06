@@ -1,33 +1,42 @@
 import pandas as pd
 import numpy as np
-import os
+from datetime import datetime, timedelta
 
-# Create directory
-output_dir = "test_data_generated"
-os.makedirs(output_dir, exist_ok=True)
+# Configuration
+start_date = datetime(2023, 1, 1)
+end_date = datetime(2024, 12, 31)
+date_range = pd.date_range(start=start_date, end=end_date, freq='D')
 
-# Generate sample data
-np.random.seed(42)
-dates = pd.date_range(start='2024-01-01', periods=12, freq='M')
-products = ['Laptop', 'Mouse', 'Keyboard', 'Monitor', 'Headphones']
+# Create basic dataframe
+df = pd.DataFrame({'Date': date_range})
+
+# Generate realistic-looking data
+np.random.seed(42) # For reproducibility
+
+# 1. Sales Volume (Random with some seasonality)
+# Base + Random + Seasonality (Higher in Dec/July)
+df['Units Sold'] = np.random.randint(50, 200, size=len(df))
+df['Units Sold'] = df.apply(lambda row: row['Units Sold'] * 1.5 if row['Date'].month in [7, 12] else row['Units Sold'], axis=1).astype(int)
+
+# 2. Revenue (Units * Price with some variation)
+# Assume average price is around $50
+df['Revenue'] = df['Units Sold'] * np.random.uniform(45, 55, size=len(df))
+df['Revenue'] = df['Revenue'].round(2)
+
+# 3. Categories
+categories = ['Electronics', 'Clothing', 'Home', 'Books', 'Toys']
+df['Category'] = np.random.choice(categories, size=len(df))
+
+# 4. Region
 regions = ['North', 'South', 'East', 'West']
+df['Region'] = np.random.choice(regions, size=len(df))
 
-data = []
-for _ in range(100):
-    data.append({
-        'Date': np.random.choice(dates),
-        'Product': np.random.choice(products),
-        'Region': np.random.choice(regions),
-        'Units Sold': np.random.randint(1, 50),
-        'Unit Price': np.random.randint(20, 2000),
-    })
+# Export
+import os
+output_dir = 'test_data_generated'
+os.makedirs(output_dir, exist_ok=True)
+output_file = os.path.join(output_dir, 'comprehensive_sales_2years.xlsx')
+df.to_excel(output_file, index=False)
 
-df = pd.DataFrame(data)
-df['Total Revenue'] = df['Units Sold'] * df['Unit Price']
-df['Date'] = df['Date'].dt.strftime('%Y-%m-%d')
-
-# Save to Excel
-output_path = os.path.join(output_dir, "sales_data.xlsx")
-df.to_excel(output_path, index=False)
-
-print(f"File created at: {os.path.abspath(output_path)}")
+print(f"Generated {len(df)} rows of data in '{output_file}'")
+print(df.head())

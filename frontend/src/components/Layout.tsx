@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Settings } from 'lucide-react';
+import { LayoutDashboard, Settings, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useDashboard } from '../contexts/DashboardContext';
 
@@ -8,6 +8,7 @@ export function Layout() {
     const { sections } = useDashboard();
 
     const navItems = [
+        { href: '/ai', label: 'AI Analyst', icon: Sparkles },
         { href: '/config', label: 'Configuration', icon: Settings },
     ];
 

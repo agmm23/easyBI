@@ -4,31 +4,13 @@
     "title": "sales",
     "charts": [
       {
-        "title": "asdasd",
-        "datasource_id": "79a43527-b322-477c-b70f-ce4d55e789a4",
+        "title": "sales",
+        "datasource_id": "c8321795-d804-4c06-9187-85849503daf3",
         "chart_type": "bar",
         "x_column": "Date",
         "y_column": "Total Revenue",
         "date_column": "Date",
-        "id": "02932d60-caef-4c36-bb6c-49d1ed81d25e"
-      },
-      {
-        "title": "fwe",
-        "datasource_id": "79a43527-b322-477c-b70f-ce4d55e789a4",
-        "chart_type": "bar",
-        "x_column": "Date",
-        "y_column": "Total Revenue",
-        "date_column": "Date",
-        "id": "471a200e-04d1-4677-9f88-eb622177f25a"
-      },
-      {
-        "title": "qwe",
-        "datasource_id": "79a43527-b322-477c-b70f-ce4d55e789a4",
-        "chart_type": "area",
-        "x_column": "Date",
-        "y_column": "Total Revenue",
-        "date_column": "Date",
-        "id": "0e3807ea-bdb0-47a4-b23c-65a941410793"
+        "id": "50570a1f-63b1-4a81-a2f3-e6fecbcf0a35"
       }
     ]
   }

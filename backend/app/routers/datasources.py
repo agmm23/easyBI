@@ -63,7 +63,14 @@ from app.services.data_processing import process_file, get_full_data
 import pandas as pd
 
 @router.get("/{id}/data")
-def get_datasource_data(id: str, start_date: Optional[str] = None, end_date: Optional[str] = None, date_column: Optional[str] = None, sort_by: Optional[str] = None):
+def get_datasource_data(id: str, 
+                        start_date: Optional[str] = None, 
+                        end_date: Optional[str] = None, 
+                        date_column: Optional[str] = None, 
+                        sort_by: Optional[str] = None,
+                        x_column: Optional[str] = None,
+                        y_column: Optional[str] = None,
+                        group_by: Optional[str] = 'day'):
     db = load_db()
     ds = next((d for d in db if d["id"] == id), None)
     if not ds:
@@ -73,7 +80,6 @@ def get_datasource_data(id: str, start_date: Optional[str] = None, end_date: Opt
         # always use get_full_data now to ensure we have the DF for filtering/sorting
         df = get_full_data(ds["path"])
         
-        # Date Filtering Logic
         # Date Filtering Logic
         if date_column and start_date and end_date and date_column in df.columns:
             print(f"--- FILTER DEBUG START ---")
@@ -109,6 +115,30 @@ def get_datasource_data(id: str, start_date: Optional[str] = None, end_date: Opt
                 return {"columns": df.columns.tolist(), "rows": []}
 
             print(f"--- FILTER DEBUG END ---")
+
+        # Aggregation Logic
+        if x_column and y_column and x_column in df.columns and y_column in df.columns:
+            try:
+                 # Ensure Y column is numeric for summing
+                 df[y_column] = pd.to_numeric(df[y_column], errors='coerce')
+                 
+                 # Handle Time Grouping
+                 if group_by in ['week', 'month']:
+                     # Ensure X is datetime for time grouping
+                     df[x_column] = pd.to_datetime(df[x_column], errors='coerce')
+                     
+                     if group_by == 'week':
+                         # Group by week (starting Monday)
+                         df[x_column] = df[x_column].dt.to_period('W').apply(lambda r: r.start_time)
+                     elif group_by == 'month':
+                         # Group by month
+                         df[x_column] = df[x_column].dt.to_period('M').apply(lambda r: r.start_time)
+
+                 # Group by X and sum Y, keeping X as valid column (as_index=False)
+                 df = df.groupby(x_column, as_index=False)[y_column].sum()
+            except Exception as e:
+                 print(f"Aggregation error: {e}")
+                 pass # Continue without aggregation if fails
             
         # Sorting Logic
         if sort_by and sort_by in df.columns:

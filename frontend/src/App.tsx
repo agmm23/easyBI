@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { Configuration } from './pages/Configuration';
+import { AiAnalyst } from './pages/AiAnalyst';
 
 import { DashboardProvider } from './contexts/DashboardContext';
 
@@ -15,6 +16,7 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="dashboard/:sectionId" element={<Dashboard />} />
             <Route path="config" element={<Configuration />} />
+            <Route path="ai" element={<AiAnalyst />} />
           </Route>
         </Routes>
       </BrowserRouter>

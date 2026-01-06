@@ -3,3 +3,5 @@ uvicorn
 pandas
 openpyxl
 python-multipart
+google-genai
+python-dotenv
