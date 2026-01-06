@@ -1,16 +1,48 @@
 [
   {
-    "id": "9f748bad-0c55-44fc-aab7-e3283e6f86a6",
+    "id": "78c633b4-ffad-4aa5-a065-8e3f354d436e",
     "title": "sales",
     "charts": [
       {
-        "title": "googlt",
-        "datasource_id": "944b5b02-d989-4a43-9499-cc144a3050a7",
-        "chart_type": "area",
+        "title": "sales",
+        "datasource_id": "5b04af55-12fb-438d-be4d-0e3088329a56",
+        "chart_type": "bar",
         "x_column": "Date",
-        "y_column": "Units Sold",
-        "date_column": "",
-        "id": "1f1eed38-033e-413e-945a-535af763644b"
+        "y_column": "Total Revenue",
+        "date_column": "Date",
+        "breakdown_x_column": "Product",
+        "breakdown_chart_type": "bar",
+        "id": "080e1081-053f-4fb0-b001-042f755b3efa"
+      },
+      {
+        "title": "asdfq",
+        "datasource_id": "5b04af55-12fb-438d-be4d-0e3088329a56",
+        "chart_type": "line",
+        "x_column": "Date",
+        "y_column": "Total Revenue",
+        "date_column": "Date",
+        "breakdown_x_column": "Branch",
+        "breakdown_chart_type": "line",
+        "id": "a2252bfb-eff4-48e0-a731-6c517e2a3091"
+      }
+    ]
+  },
+  {
+    "id": "0b5c5bec-bc81-42ca-9405-eff9f3a29ec0",
+    "title": "test",
+    "charts": [
+      {
+        "title": "qefre",
+        "datasource_id": "5b04af55-12fb-438d-be4d-0e3088329a56",
+        "chart_type": "bar",
+        "x_column": "Date",
+        "y_column": "Total Revenue",
+        "date_column": "Date",
+        "breakdown_x_column": "Product",
+        "breakdown_chart_type": "area",
+        "breakdown_x_column_2": "Region",
+        "breakdown_chart_type_2": "bar",
+        "id": "9a532a1e-e691-46ce-9a5f-3a0398749898"
       }
     ]
   }

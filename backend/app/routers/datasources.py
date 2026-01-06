@@ -86,6 +86,9 @@ def get_datasource_data(id: str,
                         sort_by: Optional[str] = None,
                         x_column: Optional[str] = None,
                         y_column: Optional[str] = None,
+                        breakdown_column: Optional[str] = None,
+                        filter_column: Optional[str] = None,
+                        filter_value: Optional[str] = None,
                         group_by: Optional[str] = 'day'):
     db = load_db()
     ds = next((d for d in db if d["id"] == id), None)
@@ -135,6 +138,16 @@ def get_datasource_data(id: str,
 
             # print(f"--- FILTER DEBUG END ---")
 
+            # print(f"--- FILTER DEBUG END ---")
+        
+        # Arbitrary Generic Filter (for cascading breakdowns)
+        if filter_column and filter_value and filter_column in df.columns:
+            # Simple string equality for now. Could be extended.
+            # Convert column to string for comparison to be safe?
+            # Or try to infer type of filter_value?
+            # For now, let's assume categorical string filtering which is the use case.
+            df = df[df[filter_column].astype(str) == str(filter_value)]
+
         # Aggregation Logic
         if x_column and y_column and x_column in df.columns and y_column in df.columns:
             try:
@@ -142,6 +155,8 @@ def get_datasource_data(id: str,
                  df[y_column] = pd.to_numeric(df[y_column], errors='coerce')
                  
                  # Handle Time Grouping
+                 group_cols = [x_column]
+
                  if group_by in ['week', 'month']:
                      # Ensure X is datetime for time grouping
                      df[x_column] = pd.to_datetime(df[x_column], errors='coerce')
@@ -152,9 +167,54 @@ def get_datasource_data(id: str,
                      elif group_by == 'month':
                          # Group by month
                          df[x_column] = df[x_column].dt.to_period('M').apply(lambda r: r.start_time)
+                
+                 # Add breakdown column to grouping if present
+                 if breakdown_column and breakdown_column in df.columns:
+                     group_cols.append(breakdown_column)
 
-                 # Group by X and sum Y, keeping X as valid column (as_index=False)
-                 df = df.groupby(x_column, as_index=False)[y_column].sum()
+                 # Group by X (and breakdown) and sum Y, keeping columns as valid (as_index=False)
+                 df_grouped = df.groupby(group_cols, as_index=False)[y_column].sum()
+                 
+                 # --- ZERO FILLING LOGIC START ---
+                 # Only apply if sorting by time or grouping by time is evident
+                 if group_by: # group_by acts as a proxy for time-series intent here
+                    try:
+                        # Determine Date Range
+                        # Use request params if available, else data min/max
+                        current_min = df_grouped[x_column].min()
+                        current_max = df_grouped[x_column].max()
+                         
+                        range_start = pd.to_datetime(start_date) if start_date else current_min
+                        range_end = pd.to_datetime(end_date) if end_date else current_max
+                        
+                        if pd.notna(range_start) and pd.notna(range_end):
+                            freq_map = {'day': 'D', 'week': 'W-MON', 'month': 'MS'}
+                            freq = freq_map.get(group_by, 'D')
+                            
+                            # Create full date index
+                            full_idx = pd.date_range(start=range_start, end=range_end, freq=freq)
+                            
+                            if breakdown_column and breakdown_column in df_grouped.columns:
+                                # For breakdown: pivot -> reindex -> unpivot
+                                pivot_df = df_grouped.set_index([x_column, breakdown_column])[y_column].unstack(fill_value=0)
+                                pivot_df = pivot_df.reindex(full_idx, fill_value=0)
+                                # Stack back to long format
+                                df_grouped = pivot_df.stack().reset_index()
+                                # Rename columns back to original names (stack creates 'level_1' or similar)
+                                df_grouped.columns = [x_column, breakdown_column, y_column]
+                            else:
+                                # For simple chart: set index -> reindex -> reset index
+                                df_grouped = df_grouped.set_index(x_column).reindex(full_idx, fill_value=0)
+                                df_grouped.index.name = x_column
+                                df_grouped = df_grouped.reset_index()
+                                
+                    except Exception as e:
+                        print(f"Zero-filling error: {e}")
+                        # Fallback to original grouped data if reindexing fails
+                        pass
+
+                 df = df_grouped
+                 # --- ZERO FILLING LOGIC END ---
             except Exception as e:
                  print(f"Aggregation error: {e}")
                  pass # Continue without aggregation if fails

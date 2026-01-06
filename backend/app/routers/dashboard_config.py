@@ -17,6 +17,10 @@ class ChartConfig(BaseModel):
     x_column: str
     y_column: str
     date_column: Optional[str] = None
+    breakdown_x_column: Optional[str] = None
+    breakdown_chart_type: Optional[str] = 'bar'
+    breakdown_x_column_2: Optional[str] = None
+    breakdown_chart_type_2: Optional[str] = 'bar'
 
 class ChartConfigCreate(BaseModel):
     title: str
@@ -25,6 +29,10 @@ class ChartConfigCreate(BaseModel):
     x_column: str
     y_column: str
     date_column: Optional[str] = None
+    breakdown_x_column: Optional[str] = None
+    breakdown_chart_type: Optional[str] = 'bar'
+    breakdown_x_column_2: Optional[str] = None
+    breakdown_chart_type_2: Optional[str] = 'bar'
 
 class SectionConfig(BaseModel):
     id: str

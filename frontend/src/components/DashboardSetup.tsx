@@ -19,6 +19,12 @@ export function DashboardSetup() {
     const [dateColumn, setDateColumn] = useState('');
     const [availableColumns, setAvailableColumns] = useState<string[]>([]);
 
+    // Breakdown State
+    const [breakdownColumn, setBreakdownColumn] = useState('');
+    const [breakdownType, setBreakdownType] = useState('bar');
+    const [breakdownColumn2, setBreakdownColumn2] = useState('');
+    const [breakdownType2, setBreakdownType2] = useState('bar');
+
     useEffect(() => {
         fetch('http://localhost:8000/api/datasources/')
             .then(res => res.json())
@@ -83,13 +89,19 @@ export function DashboardSetup() {
                     chart_type: chartType,
                     x_column: xColumn,
                     y_column: yColumn,
-                    date_column: dateColumn
+                    date_column: dateColumn,
+                    breakdown_x_column: breakdownColumn || null,
+                    breakdown_chart_type: breakdownType,
+                    breakdown_x_column_2: breakdownColumn2 || null,
+                    breakdown_chart_type_2: breakdownType2
                 })
             });
             if (response.ok) {
                 setEditingSectionId(null);
                 setChartTitle('');
                 setSelectedSource('');
+                setBreakdownColumn('');
+                setBreakdownColumn2('');
                 refreshSections();
             }
         } catch (err) { console.error(err); }
@@ -235,6 +247,55 @@ export function DashboardSetup() {
                                             {availableColumns.map(col => <option key={col} value={col}>{col}</option>)}
                                         </select>
                                     </div>
+
+                                    <div className="col-span-full border-t pt-4 mt-2">
+                                        <h6 className="text-sm font-medium text-gray-700 mb-2">Breakdown 1 Configuration (Optional)</h6>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <select
+                                                value={breakdownColumn}
+                                                onChange={(e) => setBreakdownColumn(e.target.value)}
+                                                className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border"
+                                            >
+                                                <option value="">No Breakdown...</option>
+                                                {availableColumns.map(col => <option key={col} value={col}>{col}</option>)}
+                                            </select>
+                                            <select
+                                                value={breakdownType}
+                                                onChange={(e) => setBreakdownType(e.target.value)}
+                                                className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border"
+                                                disabled={!breakdownColumn}
+                                            >
+                                                <option value="bar">Bar Chart</option>
+                                                <option value="line">Line Chart</option>
+                                                <option value="area">Area Chart</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-span-full border-t pt-4 mt-2">
+                                        <h6 className="text-sm font-medium text-gray-700 mb-2">Breakdown 2 Configuration (Optional - Cascading)</h6>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <select
+                                                value={breakdownColumn2}
+                                                onChange={(e) => setBreakdownColumn2(e.target.value)}
+                                                className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border"
+                                                disabled={!breakdownColumn}
+                                            >
+                                                <option value="">No Second Breakdown...</option>
+                                                {availableColumns.map(col => <option key={col} value={col}>{col}</option>)}
+                                            </select>
+                                            <select
+                                                value={breakdownType2}
+                                                onChange={(e) => setBreakdownType2(e.target.value)}
+                                                className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border"
+                                                disabled={!breakdownColumn2}
+                                            >
+                                                <option value="bar">Bar Chart</option>
+                                                <option value="line">Line Chart</option>
+                                                <option value="area">Area Chart</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="mt-4 flex justify-end space-x-2">
                                     <button
@@ -259,5 +320,7 @@ export function DashboardSetup() {
                 )}
             </div>
         </div>
+
     );
 }
+
