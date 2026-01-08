@@ -5,22 +5,25 @@ import { Configuration } from './pages/Configuration';
 import { AiAnalyst } from './pages/AiAnalyst';
 
 import { DashboardProvider } from './contexts/DashboardContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 function App() {
   return (
-    <DashboardProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="dashboard/:sectionId" element={<Dashboard />} />
-            <Route path="config" element={<Configuration />} />
-            <Route path="ai" element={<AiAnalyst />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </DashboardProvider>
+    <LanguageProvider>
+      <DashboardProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="dashboard/:sectionId" element={<Dashboard />} />
+              <Route path="config" element={<Configuration />} />
+              <Route path="ai" element={<AiAnalyst />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </DashboardProvider>
+    </LanguageProvider>
   );
 }
 

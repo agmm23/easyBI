@@ -2,14 +2,16 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Settings, Sparkles } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useDashboard } from '../contexts/DashboardContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export function Layout() {
     const location = useLocation();
     const { sections } = useDashboard();
+    const { t } = useLanguage();
 
     const navItems = [
-        { href: '/ai', label: 'AI Analyst', icon: Sparkles },
-        { href: '/config', label: 'Configuration', icon: Settings },
+        { href: '/ai', label: t('nav.aiAnalyst'), icon: Sparkles },
+        { href: '/config', label: t('nav.configuration'), icon: Settings },
     ];
 
     return (
@@ -24,7 +26,7 @@ export function Layout() {
                     <div className="space-y-1">
                         <div className="px-3 py-2 text-sm font-semibold text-gray-900 flex items-center">
                             <LayoutDashboard className="w-5 h-5 mr-3 text-gray-500" />
-                            Dashboards
+                            {t('nav.dashboards')}
                         </div>
 
                         <div className="pl-4 space-y-1 border-l-2 border-gray-100 ml-4">
@@ -42,7 +44,7 @@ export function Layout() {
                                     {section.title}
                                 </Link>
                             )) : (
-                                <p className="px-3 py-2 text-xs text-gray-400 italic">No groups yet</p>
+                                <p className="px-3 py-2 text-xs text-gray-400 italic">{t('nav.noGroups')}</p>
                             )}
                         </div>
                     </div>

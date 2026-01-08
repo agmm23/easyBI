@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardChart } from '../components/DashboardChart';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { PlusCircle } from 'lucide-react';
 import { useDashboard } from '../contexts/DashboardContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export function Dashboard() {
     const { sectionId } = useParams();
     const navigate = useNavigate();
     const { sections } = useDashboard();
+    const { t } = useLanguage();
 
     // Date Range State
     const [selectedRange, setSelectedRange] = useState('all');
@@ -89,14 +91,14 @@ export function Dashboard() {
     if (sections.length === 0) {
         return (
             <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900">Dashboard Empty</h2>
-                <p className="text-gray-500 mt-2">You haven't configured any sections yet.</p>
+                <h2 className="text-2xl font-bold text-gray-900">{t('dashboard.empty')}</h2>
+                <p className="text-gray-500 mt-2">{t('dashboard.noSections')}</p>
                 <Link
                     to="/config"
                     className="mt-6 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
                 >
                     <PlusCircle className="mr-2 h-5 w-5" />
-                    Configure Dashboard
+                    {t('dashboard.configure')}
                 </Link>
             </div>
         );
@@ -110,8 +112,8 @@ export function Dashboard() {
     if (sectionId && filteredSections.length === 0) {
         return (
             <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-gray-900">Group Not Found</h2>
-                <p className="text-gray-500">Please select a dashboard from the sidebar.</p>
+                <h2 className="text-2xl font-bold text-gray-900">{t('dashboard.groupNotFound')}</h2>
+                <p className="text-gray-500">{t('dashboard.selectGroup')}</p>
             </div>
         );
     }
@@ -124,7 +126,7 @@ export function Dashboard() {
                         {filteredSections[0]?.title}
                     </h2>
                     <p className="text-gray-500">
-                        Dashboard View
+                        {t('dashboard.view')}
                     </p>
                 </div>
 
@@ -132,34 +134,34 @@ export function Dashboard() {
                 <div className="flex flex-wrap items-center gap-3">
                     {/* Group By Selector */}
                     <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
-                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Group By:</label>
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('dashboard.groupBy')}</label>
                         <select
                             value={timeGrouping}
                             onChange={(e) => setTimeGrouping(e.target.value)}
                             className="text-sm font-medium text-gray-700 bg-transparent border-none focus:ring-0 cursor-pointer outline-none"
                         >
-                            <option value="day">Day</option>
-                            <option value="week">Week</option>
-                            <option value="month">Month</option>
+                            <option value="day">{t('period.day')}</option>
+                            <option value="week">{t('period.week')}</option>
+                            <option value="month">{t('period.month')}</option>
                         </select>
                     </div>
 
                     {/* Date Range Selector */}
                     <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
-                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date Range:</label>
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('dashboard.dateRange')}</label>
                         <select
                             value={selectedRange}
                             onChange={(e) => handleRangeChange(e.target.value)}
                             className="text-sm font-medium text-gray-700 bg-transparent border-none focus:ring-0 cursor-pointer outline-none"
                         >
-                            <option value="all">All Time</option>
-                            <option value="last_week">Last Week</option>
-                            <option value="last_month">Last Month</option>
-                            <option value="last_3_months">Last 3 Months</option>
-                            <option value="last_6_months">Last 6 Months</option>
-                            <option value="last_year">Last Year</option>
-                            <option value="ytd">Year to Date</option>
-                            <option value="custom">Custom</option>
+                            <option value="all">{t('period.all')}</option>
+                            <option value="last_week">{t('period.last_week')}</option>
+                            <option value="last_month">{t('period.last_month')}</option>
+                            <option value="last_3_months">{t('period.last_3_months')}</option>
+                            <option value="last_6_months">{t('period.last_6_months')}</option>
+                            <option value="last_year">{t('period.last_year')}</option>
+                            <option value="ytd">{t('period.ytd')}</option>
+                            <option value="custom">{t('period.custom')}</option>
                         </select>
                     </div>
 
@@ -170,21 +172,21 @@ export function Dashboard() {
                             value={customStart}
                             onChange={(e) => handleCustomDateChange('start', e.target.value)}
                             className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
-                            placeholder="Start Date"
+                            placeholder={t('common.start')}
                         />
-                        <span className="text-gray-300">to</span>
+                        <span className="text-gray-300">{t('common.to')}</span>
                         <input
                             type="date"
                             value={customEnd}
                             onChange={(e) => handleCustomDateChange('end', e.target.value)}
                             className="border-none focus:ring-0 text-sm text-gray-600 bg-transparent"
-                            placeholder="End Date"
+                            placeholder={t('common.end')}
                         />
                         <button
                             onClick={() => handleRangeChange('all')}
                             className="text-xs text-red-500 hover:text-red-700 px-2 font-medium"
                         >
-                            Clear
+                            {t('common.clear')}
                         </button>
                     </div>
 
@@ -209,7 +211,7 @@ export function Dashboard() {
                             ))
                         ) : (
                             <div className="col-span-full py-8 text-center text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                No charts in this group yet.
+                                {t('dashboard.noCharts')}
                             </div>
                         )}
                     </div>

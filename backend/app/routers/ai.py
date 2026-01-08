@@ -70,6 +70,8 @@ async def chat_with_data(request: ChatRequest):
     - Handle date columns assuming they might be strings (convert with pd.to_datetime if needed).
     - DO NOT write usage examples, just the function definition.
     - Use standard pandas operations.
+    - CRITICAL: If the User Query is NOT related to the provided Dataset Info or data analysis, DO NOT generate any code. Instead, just output the exact text: "I can only answer questions about your company data." (Translated to the language of the User Query).
+    - ANSWER in the same language as the User Query.
     """
 
     # 4. Call Model to Generate Code
