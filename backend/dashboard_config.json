@@ -25,7 +25,8 @@
         "breakdown_chart_type": "line",
         "id": "a2252bfb-eff4-48e0-a731-6c517e2a3091"
       }
-    ]
+    ],
+    "layout_columns": 2
   },
   {
     "id": "0b5c5bec-bc81-42ca-9405-eff9f3a29ec0",
@@ -44,6 +45,7 @@
         "breakdown_chart_type_2": "bar",
         "id": "9a532a1e-e691-46ce-9a5f-3a0398749898"
       }
-    ]
+    ],
+    "layout_columns": 1
   }
 ]

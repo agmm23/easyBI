@@ -195,7 +195,7 @@ export function Dashboard() {
 
             {filteredSections.map((section) => (
                 <div key={section.id} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className={`grid grid-cols-1 ${(!section.layout_columns || section.layout_columns === 2) ? 'md:grid-cols-2' : 'max-w-5xl mx-auto'} gap-6`}>
                         {section.charts && section.charts.length > 0 ? (
                             section.charts.map((chart: any) => (
                                 <DashboardChart
@@ -204,6 +204,7 @@ export function Dashboard() {
                                     timeGrouping={timeGrouping}
                                     startDate={startDate}
                                     endDate={endDate}
+                                    className={section.layout_columns === 1 ? 'min-h-[85vh]' : ''}
                                 />
                             ))
                         ) : (

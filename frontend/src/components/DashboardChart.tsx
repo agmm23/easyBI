@@ -6,9 +6,10 @@ interface DashboardChartProps {
     timeGrouping?: string;
     startDate?: string;
     endDate?: string;
+    className?: string;
 }
 
-export function DashboardChart({ chart, timeGrouping, startDate, endDate }: DashboardChartProps) {
+export function DashboardChart({ chart, timeGrouping, startDate, endDate, className }: DashboardChartProps) {
 
     const [data, setData] = useState<any>(null);
     const [breakdownData, setBreakdownData] = useState<any>(null);
@@ -239,7 +240,7 @@ export function DashboardChart({ chart, timeGrouping, startDate, endDate }: Dash
     };
 
     return (
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm h-full flex flex-col space-y-4">
+        <div className={`bg-white p-4 rounded-xl border border-gray-200 shadow-sm h-full flex flex-col space-y-4 ${className || ''}`}>
             <div className="flex-1 min-h-[200px] w-full flex flex-col">
                 <h3 className="text-sm font-semibold text-gray-800 mb-2">{chart.title}</h3>
                 <div className="flex-1">

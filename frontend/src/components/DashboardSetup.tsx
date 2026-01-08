@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Plus, Trash2, Layout } from 'lucide-react';
+import { Save, Plus, Trash2, Layout, Settings, Grid, Square } from 'lucide-react';
 import { useDashboard } from '../contexts/DashboardContext';
 
 export function DashboardSetup() {
@@ -8,6 +8,7 @@ export function DashboardSetup() {
 
     // New Section State
     const [newSectionTitle, setNewSectionTitle] = useState('');
+    const [newSectionColumns, setNewSectionColumns] = useState(2); // Default to 2
 
     // New Chart State (per section form)
     const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
@@ -65,10 +66,29 @@ export function DashboardSetup() {
             const response = await fetch('http://localhost:8000/api/dashboard-config/sections', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: newSectionTitle })
+                body: JSON.stringify({
+                    title: newSectionTitle,
+                    layout_columns: newSectionColumns
+                })
             });
             if (response.ok) {
                 setNewSectionTitle('');
+                setNewSectionColumns(2);
+                refreshSections();
+            }
+        } catch (err) { console.error(err); }
+    };
+
+    const handleUpdateSectionLayout = async (sectionId: string, columns: number) => {
+        try {
+            const response = await fetch(`http://localhost:8000/api/dashboard-config/sections/${sectionId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    layout_columns: columns
+                })
+            });
+            if (response.ok) {
                 refreshSections();
             }
         } catch (err) { console.error(err); }
@@ -127,17 +147,31 @@ export function DashboardSetup() {
             {/* Create Section Form */}
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Dashboard Group</h3>
-                <div className="flex gap-4">
-                    <input
-                        type="text"
-                        value={newSectionTitle}
-                        onChange={(e) => setNewSectionTitle(e.target.value)}
-                        className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3 border"
-                        placeholder="Group Title (e.g. Sales, Operations)"
-                    />
+                <div className="flex gap-4 items-end">
+                    <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Group Title</label>
+                        <input
+                            type="text"
+                            value={newSectionTitle}
+                            onChange={(e) => setNewSectionTitle(e.target.value)}
+                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                            placeholder="e.g. Sales, Operations"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Charts per Row</label>
+                        <select
+                            value={newSectionColumns}
+                            onChange={(e) => setNewSectionColumns(Number(e.target.value))}
+                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
+                        >
+                            <option value={1}>1 Chart (Full Width)</option>
+                            <option value={2}>2 Charts (Half Width)</option>
+                        </select>
+                    </div>
                     <button
                         onClick={handleCreateSection}
-                        className="flex items-center px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                        className="flex items-center px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium h-[42px]"
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         Add Group
@@ -150,10 +184,30 @@ export function DashboardSetup() {
                 {sections.map(section => (
                     <div key={section.id} className="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm">
                         <div className="flex justify-between items-center mb-6">
-                            <h4 className="text-xl font-bold text-gray-900 flex items-center">
-                                <Layout className="w-5 h-5 mr-2 text-indigo-600" />
-                                {section.title}
-                            </h4>
+                            <div className="flex items-center gap-4">
+                                <h4 className="text-xl font-bold text-gray-900 flex items-center">
+                                    <Layout className="w-5 h-5 mr-2 text-indigo-600" />
+                                    {section.title}
+                                </h4>
+                                <div className="flex items-center bg-white rounded-md border border-gray-200 p-1">
+                                    <button
+                                        onClick={() => handleUpdateSectionLayout(section.id, 1)}
+                                        className={`p-1.5 rounded ${section.layout_columns === 1 ? 'bg-indigo-100 text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
+                                        title="1 Chart per Row"
+                                    >
+                                        <Square className="w-4 h-4" />
+                                    </button>
+                                    <div className="w-px h-4 bg-gray-200 mx-1"></div>
+                                    <button
+                                        onClick={() => handleUpdateSectionLayout(section.id, 2)}
+                                        className={`p-1.5 rounded ${!section.layout_columns || section.layout_columns === 2 ? 'bg-indigo-100 text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
+                                        title="2 Charts per Row"
+                                    >
+                                        <Grid className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+
                             <button
                                 onClick={() => handleDeleteSection(section.id)}
                                 className="text-red-500 hover:text-red-700 text-sm flex items-center"
@@ -163,7 +217,7 @@ export function DashboardSetup() {
                         </div>
 
                         {/* Charts List */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                        <div className={`grid grid-cols-1 ${(!section.layout_columns || section.layout_columns === 2) ? 'md:grid-cols-2' : ''} gap-4 mb-4`}>
                             {section.charts?.map((chart: any) => (
                                 <div key={chart.id} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm relative group">
                                     <h5 className="font-semibold text-gray-800">{chart.title}</h5>
@@ -180,7 +234,7 @@ export function DashboardSetup() {
                             {!editingSectionId && (
                                 <button
                                     onClick={() => setEditingSectionId(section.id)}
-                                    className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition text-gray-500 hover:text-indigo-600 h-full"
+                                    className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition text-gray-500 hover:text-indigo-600 h-full min-h-[100px]"
                                 >
                                     <Plus className="w-8 h-8 mb-2" />
                                     <span className="font-medium">Add Chart</span>

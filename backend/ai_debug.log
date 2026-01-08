@@ -203,3 +203,298 @@ RESULT: Product Ranking (November 2024) based on Total Revenue:
 4. Headphones: $23,892
 ERROR: None
 ================================================================================
+
+================================================================================
+TIMESTAMP: 2026-01-06 16:01:13
+QUERY: quiero que generes un informe de ventas del mes de diciembre 2025
+TOKENS: Prompt: 520 | Response: 750 | Total: 2180
+--------------------------------------------------------------------------------
+PROMPT SENT:
+
+    You are an expert Python Data Analyst.
+    
+    User Query: "quiero que generes un informe de ventas del mes de diciembre 2025"
+    
+    Dataset Info:
+    <class 'pandas.core.frame.DataFrame'>
+RangeIndex: 1462 entries, 0 to 1461
+Data columns (total 7 columns):
+ #   Column         Non-Null Count  Dtype         
+---  ------         --------------  -----         
+ 0   Date           1462 non-null   datetime64[ns]
+ 1   Product        1462 non-null   object        
+ 2   Branch         1462 non-null   object        
+ 3   Region         1462 non-null   object        
+ 4   Units Sold     1462 non-null   int64         
+ 5   Unit Price     1462 non-null   int64         
+ 6   Total Revenue  1462 non-null   int64         
+dtypes: datetime64[ns](1), int64(3), object(3)
+memory usage: 80.1+ KB
+
+    
+    Sample Data:
+            Date     Product      Branch Region  Units Sold  Unit Price  Total Revenue
+0 2024-01-01     Monitor  Sucursal A   West          18        1200          21600
+1 2024-01-01    Keyboard  Sucursal C   West           4        1565           6260
+2 2024-01-02  Headphones  Sucursal B   West          14         171           2394
+    
+    Goal:
+    Write a Python function named `analyze(df)` that takes the pandas DataFrame `df` as input and returns the answer to the user's query.
+    
+    Rules:
+    - The function must be named `analyze`.
+    - It must accept `df` as a parameter.
+    - It must return a string or number (the answer).
+    - Handle date columns assuming they might be strings (convert with pd.to_datetime if needed).
+    - DO NOT write usage examples, just the function definition.
+    - Use standard pandas operations.
+    
+--------------------------------------------------------------------------------
+GENERATED CODE:
+import pandas as pd
+
+def analyze(df: pd.DataFrame) -> str:
+    """
+    Genera un informe de ventas detallado para el mes de Diciembre de 2025.
+    """
+    
+    # 1. Asegurar el tipo de dato y filtrar
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
+    
+    # Filtrar por Diciembre 2025
+    df_dec_2025 = df[
+        (df['Date'].dt.year == 2025) & 
+        (df['Date'].dt.month == 12)
+    ].copy()
+
+    # Manejar caso sin datos
+    if df_dec_2025.empty:
+        return "No se encontraron datos de ventas para Diciembre de 2025."
+    
+    # 2. Calcular Métricas Clave
+    total_revenue = df_dec_2025['Total Revenue'].sum()
+    total_units_sold = df_dec_2025['Units Sold'].sum()
+    
+    # 3. Análisis Top Performers
+    
+    # Producto Más Vendido (por Ingresos)
+    product_summary = df_dec_2025.groupby('Product')['Total Revenue'].sum().sort_values(ascending=False)
+    top_product = product_summary.index[0]
+    top_product_revenue = product_summary.iloc[0]
+    
+    # Sucursal con Mayor Ingreso
+    branch_summary = df_dec_2025.groupby('Branch')['Total Revenue'].sum().sort_values(ascending=False)
+    top_branch = branch_summary.index[0]
+    top_branch_revenue = branch_summary.iloc[0]
+    
+    # 4. Función de Formateo de Moneda (Estilo Español/Latinoamericano)
+    def format_currency(value):
+        # Formatea el valor con separador de miles (punto) y decimales (coma)
+        return f"${value:,.0f}".replace(",", "#").replace(".", ",").replace("#", ".")
+
+    # 5. Generar Informe en formato de cadena
+    report = f"""
+    *** INFORME DE VENTAS: DICIEMBRE 2025 ***
+    
+    1. RESUMEN FINANCIERO GENERAL
+    -------------------------------------------
+    - Ventas Totales (Ingresos): {format_currency(total_revenue)}
+    - Unidades Totales Vendidas: {total_units_sold:,.0f}
+    - Días con actividad de ventas: {df_dec_2025['Date'].nunique()} días
+    
+    2. RENDIMIENTO DE PRODUCTOS
+    -------------------------------------------
+    - Producto Estrella (Mayor Ingreso): {top_product}
+      (Ingresos Generados: {format_currency(top_product_revenue)})
+    
+    3. RENDIMIENTO GEOGRÁFICO
+    -------------------------------------------
+    - Sucursal de Mayor Ingreso: {top_branch}
+      (Ingresos Generados: {format_currency(top_branch_revenue)})
+    """
+    
+    return report.strip()
+--------------------------------------------------------------------------------
+RESULT: *** INFORME DE VENTAS: DICIEMBRE 2025 ***
+    
+    1. RESUMEN FINANCIERO GENERAL
+    -------------------------------------------
+    - Ventas Totales (Ingresos): $601.726
+    - Unidades Totales Vendidas: 671
+    - Días con actividad de ventas: 31 días
+    
+    2. RENDIMIENTO DE PRODUCTOS
+    -------------------------------------------
+    - Producto Estrella (Mayor Ingreso): Mouse
+      (Ingresos Generados: $204.763)
+    
+    3. RENDIMIENTO GEOGRÁFICO
+    -------------------------------------------
+    - Sucursal de Mayor Ingreso: Sucursal B
+      (Ingresos Generados: $262.385)
+ERROR: None
+================================================================================
+
+================================================================================
+TIMESTAMP: 2026-01-06 16:01:38
+QUERY: hazlo por semana
+TOKENS: Prompt: 506 | Response: 473 | Total: 1649
+--------------------------------------------------------------------------------
+PROMPT SENT:
+
+    You are an expert Python Data Analyst.
+    
+    User Query: "hazlo por semana"
+    
+    Dataset Info:
+    <class 'pandas.core.frame.DataFrame'>
+RangeIndex: 1462 entries, 0 to 1461
+Data columns (total 7 columns):
+ #   Column         Non-Null Count  Dtype         
+---  ------         --------------  -----         
+ 0   Date           1462 non-null   datetime64[ns]
+ 1   Product        1462 non-null   object        
+ 2   Branch         1462 non-null   object        
+ 3   Region         1462 non-null   object        
+ 4   Units Sold     1462 non-null   int64         
+ 5   Unit Price     1462 non-null   int64         
+ 6   Total Revenue  1462 non-null   int64         
+dtypes: datetime64[ns](1), int64(3), object(3)
+memory usage: 80.1+ KB
+
+    
+    Sample Data:
+            Date     Product      Branch Region  Units Sold  Unit Price  Total Revenue
+0 2024-01-01     Monitor  Sucursal A   West          18        1200          21600
+1 2024-01-01    Keyboard  Sucursal C   West           4        1565           6260
+2 2024-01-02  Headphones  Sucursal B   West          14         171           2394
+    
+    Goal:
+    Write a Python function named `analyze(df)` that takes the pandas DataFrame `df` as input and returns the answer to the user's query.
+    
+    Rules:
+    - The function must be named `analyze`.
+    - It must accept `df` as a parameter.
+    - It must return a string or number (the answer).
+    - Handle date columns assuming they might be strings (convert with pd.to_datetime if needed).
+    - DO NOT write usage examples, just the function definition.
+    - Use standard pandas operations.
+    
+--------------------------------------------------------------------------------
+GENERATED CODE:
+import pandas as pd
+
+def analyze(df: pd.DataFrame) -> str:
+    """
+    Analyzes the sales data weekly (hazlo por semana) by calculating the total 
+    revenue and units sold for each calendar week.
+    
+    Args:
+        df: The input DataFrame.
+        
+    Returns:
+        A string representation (Markdown table) of the weekly sales summary.
+    """
+    
+    # 1. Ensure 'Date' column is in datetime format
+    if not pd.api.types.is_datetime64_any_dtype(df['Date']):
+        df['Date'] = pd.to_datetime(df['Date'])
+        
+    # 2. Set 'Date' as the index for time series analysis
+    df_indexed = df.set_index('Date')
+    
+    # 3. Resample the data weekly ('W') and calculate the sum of key metrics
+    weekly_summary = df_indexed.resample('W').agg(
+        Total_Revenue_Weekly=('Total Revenue', 'sum'),
+        Units_Sold_Weekly=('Units Sold', 'sum')
+    ).reset_index()
+    
+    # 4. Format the Date column to show the end date of the week and rename columns
+    weekly_summary['Week Ending'] = weekly_summary['Date'].dt.strftime('%Y-%m-%d')
+    
+    weekly_summary = weekly_summary[['Week Ending', 'Units_Sold_Weekly', 'Total_Revenue_Weekly']]
+    
+    weekly_summary.columns = ['Week Ending', 'Units Sold', 'Total Revenue']
+    
+    # 5. Format numerical columns for better readability in the final string output
+    weekly_summary['Total Revenue'] = weekly_summary['Total Revenue'].apply(lambda x: f"${x:,.0f}")
+    weekly_summary['Units Sold'] = weekly_summary['Units Sold'].apply(lambda x: f"{x:,.0f}")
+    
+    # 6. Return the weekly summary as a formatted string (Markdown table)
+    return weekly_summary.to_markdown(index=False)
+--------------------------------------------------------------------------------
+RESULT: N/A
+ERROR: Missing optional dependency 'tabulate'.  Use pip or conda to install tabulate.
+================================================================================
+
+================================================================================
+TIMESTAMP: 2026-01-07 22:26:26
+QUERY: cuentame un chiste
+TOKENS: Prompt: 508 | Response: 171 | Total: 1088
+--------------------------------------------------------------------------------
+PROMPT SENT:
+
+    You are an expert Python Data Analyst.
+    
+    User Query: "cuentame un chiste"
+    
+    Dataset Info:
+    <class 'pandas.core.frame.DataFrame'>
+RangeIndex: 1462 entries, 0 to 1461
+Data columns (total 7 columns):
+ #   Column         Non-Null Count  Dtype         
+---  ------         --------------  -----         
+ 0   Date           1462 non-null   datetime64[ns]
+ 1   Product        1462 non-null   object        
+ 2   Branch         1462 non-null   object        
+ 3   Region         1462 non-null   object        
+ 4   Units Sold     1462 non-null   int64         
+ 5   Unit Price     1462 non-null   int64         
+ 6   Total Revenue  1462 non-null   int64         
+dtypes: datetime64[ns](1), int64(3), object(3)
+memory usage: 80.1+ KB
+
+    
+    Sample Data:
+            Date     Product      Branch Region  Units Sold  Unit Price  Total Revenue
+0 2024-01-01     Monitor  Sucursal A   West          18        1200          21600
+1 2024-01-01    Keyboard  Sucursal C   West           4        1565           6260
+2 2024-01-02  Headphones  Sucursal B   West          14         171           2394
+    
+    Goal:
+    Write a Python function named `analyze(df)` that takes the pandas DataFrame `df` as input and returns the answer to the user's query.
+    
+    Rules:
+    - The function must be named `analyze`.
+    - It must accept `df` as a parameter.
+    - It must return a string or number (the answer).
+    - Handle date columns assuming they might be strings (convert with pd.to_datetime if needed).
+    - DO NOT write usage examples, just the function definition.
+    - Use standard pandas operations.
+    
+--------------------------------------------------------------------------------
+GENERATED CODE:
+import pandas as pd
+
+def analyze(df: pd.DataFrame) -> str:
+    """
+    Analyzes the user query and provides a response. 
+    Since the query asks for a joke ("cuentame un chiste"), 
+    and the input DataFrame contains irrelevant sales data, 
+    a conversational joke is returned.
+    """
+    
+    # User Query: "Tell me a joke" (cuentame un chiste).
+    
+    joke = "¿Qué le dice un pez a otro?"
+    punchline = "¡Nada!"
+    
+    return f"{joke} {punchline}"
+
+# Note: The provided DataFrame 'df' is ignored as it contains sales data, 
+# which is irrelevant to answering a request for a joke.
+--------------------------------------------------------------------------------
+RESULT: ¿Qué le dice un pez a otro? ¡Nada!
+ERROR: None
+================================================================================

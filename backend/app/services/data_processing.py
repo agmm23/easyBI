@@ -53,12 +53,49 @@ def process_file(file_path: str):
     except Exception as e:
         raise ValueError(f"Error processing file/url: {str(e)}")
 
-def get_full_data(file_path: str):
+import os
+import time
+
+# Global Cache
+# Key: file_path (str)
+# Value: {
+#   'df': DataFrame,
+#   'mtime': float (for local files),
+#   'timestamp': float (time of load, for TTL)
+# }
+_DATA_CACHE = {}
+CACHE_TTL = 300 # 5 minutes for remote files
+
+def get_full_data(file_path: str, force_refresh: bool = False):
     """
     Reads the entire file (or URL) and returns it as a DataFrame.
+    Uses in-memory caching to improve performance.
     """
+    global _DATA_CACHE
+    
+    current_time = time.time()
+    is_remote = file_path.startswith('http')
+    
+    # 1. Check Cache
+    if not force_refresh and file_path in _DATA_CACHE:
+        entry = _DATA_CACHE[file_path]
+        
+        if is_remote:
+            # TTL Check for Remote Files
+            if current_time - entry['timestamp'] < CACHE_TTL:
+                return entry['df'].copy()
+        else:
+            # Modification Time Check for Local Files
+            try:
+                current_mtime = os.path.getmtime(file_path)
+                if current_mtime == entry['mtime']:
+                    return entry['df'].copy()
+            except OSError:
+                pass
+
+    # 2. Load Data (Cache Miss, Expired, or Changed)
     try:
-        if file_path.startswith('http'):
+        if is_remote:
             if "docs.google.com" in file_path:
                 csv_url = convert_google_sheet_url(file_path)
                 df = pd.read_csv(csv_url)
@@ -71,6 +108,21 @@ def get_full_data(file_path: str):
         else:
             raise ValueError("Unsupported file format")
         
-        return df
+        # 3. Update Cache
+        mtime = 0
+        if not is_remote:
+            try:
+                mtime = os.path.getmtime(file_path)
+            except OSError:
+                pass
+                
+        _DATA_CACHE[file_path] = {
+            'df': df,
+            'mtime': mtime,
+            'timestamp': current_time
+        }
+        
+        return df.copy()
+        
     except Exception as e:
         raise ValueError(f"Error processing file/url: {str(e)}")

@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 interface DashboardSection {
     id: string;
     title: string;
+    layout_columns?: number;
     charts: any[];
 }
 

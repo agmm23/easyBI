@@ -100,46 +100,25 @@ def get_datasource_data(id: str,
         df = get_full_data(ds["path"])
         
         if date_column and (start_date or end_date) and date_column in df.columns:
-            # print(f"--- FILTER DEBUG START ---") # Cleaning up old print too if desired, or keeping it
-
-            print(f"Filtering column '{date_column}'")
-            print(f"Range: {start_date} to {end_date}")
-            print(f"Sample data BEFORE conversion (first 5): {df[date_column].astype(str).head(5).tolist()}")
-            
             # Clean whitespace just in case and convert
             # using infer_datetime_format=True (deprecated in new pandas but safe usually) or just standard
             df[date_column] = pd.to_datetime(df[date_column].astype(str).str.strip(), errors='coerce')
             
-            print(f"Sample data AFTER conversion (first 5): {df[date_column].head(5).tolist()}")
-            
             # Check for NaTs
             nat_count = df[date_column].isna().sum()
-            if nat_count > 0:
-                print(f"WARNING: {nat_count} rows could not be converted to dates and became NaT (Not a Time).")
             
             try:
                 # Fix: Make end_date include the full day (up to 23:59:59.999)
-                # If start_date is missing, default to min date
                 start_dt = pd.to_datetime(start_date) if start_date else pd.Timestamp.min
-                # If end_date is missing, default to max date
                 end_dt = pd.to_datetime(end_date) + pd.Timedelta(days=1) if end_date else pd.Timestamp.max
-                
-                print(f"Filter Interval: [{start_dt}] to strictly less than [{end_dt}]")
                 
                 mask = (df[date_column] >= start_dt) & (df[date_column] < end_dt)
                 df = df.loc[mask]
-                print(f"Rows remaining: {len(df)}")
 
             except Exception as e:
-                print(f"Date conversion error (out of bounds or invalid): {e}")
-                # If dates are invalid (e.g. year 0002 while typing), we can either return empty or all data.
-                # Returning empty avoids showing misleading data.
-                return {"columns": df.columns.tolist(), "rows": []}
-
-            # print(f"--- FILTER DEBUG END ---")
-
-            # print(f"--- FILTER DEBUG END ---")
+                pass
         
+
         # Arbitrary Generic Filter (for cascading breakdowns)
         if filter_column and filter_value and filter_column in df.columns:
             # Simple string equality for now. Could be extended.
@@ -219,6 +198,7 @@ def get_datasource_data(id: str,
                  print(f"Aggregation error: {e}")
                  pass # Continue without aggregation if fails
             
+            
         # Sorting Logic
         if sort_by and sort_by in df.columns:
             # Check if column is likely date to ensure proper sort
@@ -231,7 +211,7 @@ def get_datasource_data(id: str,
 
         # Clean NaNs for JSON
         df = df.where(pd.notnull(df), None)
-
+        
         return {
             "columns": df.columns.tolist(),
             "rows": df.to_dict(orient="records")

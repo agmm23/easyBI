@@ -37,10 +37,16 @@ class ChartConfigCreate(BaseModel):
 class SectionConfig(BaseModel):
     id: str
     title: str
+    layout_columns: Optional[int] = 2
     charts: List[ChartConfig] = []
 
 class SectionConfigCreate(BaseModel):
     title: str
+    layout_columns: Optional[int] = 2
+
+class SectionConfigUpdate(BaseModel):
+    title: Optional[str] = None
+    layout_columns: Optional[int] = None
 
 def load_config():
     if not os.path.exists(CONFIG_FILE):
@@ -67,11 +73,27 @@ def create_section(section: SectionConfigCreate):
     new_section = {
         "id": str(uuid.uuid4()),
         "title": section.title,
+        "layout_columns": section.layout_columns or 2,
         "charts": []
     }
     config.append(new_section)
     save_config(config)
     return new_section
+
+@router.put("/sections/{id}", response_model=SectionConfig)
+def update_section(id: str, section_update: SectionConfigUpdate):
+    config = load_config()
+    section = next((s for s in config if s["id"] == id), None)
+    if not section:
+        raise HTTPException(status_code=404, detail="Section not found")
+    
+    if section_update.title is not None:
+        section["title"] = section_update.title
+    if section_update.layout_columns is not None:
+        section["layout_columns"] = section_update.layout_columns
+        
+    save_config(config)
+    return section
 
 @router.delete("/sections/{id}")
 def delete_section(id: str):
