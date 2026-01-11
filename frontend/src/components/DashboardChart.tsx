@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, LineChart, Line, AreaChart, Area, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface DashboardChartProps {
     chart: any;
@@ -31,6 +31,10 @@ export function DashboardChart({ chart, timeGrouping, startDate, endDate, classN
             url += `&date_column=${dateColumn}`;
             if (startDate) url += `&start_date=${startDate}`;
             if (endDate) url += `&end_date=${endDate}`;
+        }
+
+        if (chart.y_column_2) {
+            url += `&y_column_2=${chart.y_column_2}`;
         }
 
 
@@ -190,6 +194,15 @@ export function DashboardChart({ chart, timeGrouping, startDate, endDate, classN
         'area': Area
     }[chart.chart_type] || Bar;
 
+    const DataComponent2 = {
+        'bar': Bar,
+        'line': Line,
+        'area': Area
+    }[chart.chart_type_2 || 'line'] || Line;
+
+    const isDual = !!chart.y_column_2;
+    const MainChartComponent = isDual ? ComposedChart : ChartComponent;
+
     const BreakdownChartComponent = {
         'bar': BarChart,
         'line': LineChart,
@@ -245,7 +258,7 @@ export function DashboardChart({ chart, timeGrouping, startDate, endDate, classN
                 <h3 className="text-sm font-semibold text-gray-800 mb-2">{chart.title}</h3>
                 <div className="flex-1">
                     <ResponsiveContainer width="100%" height="100%">
-                        <ChartComponent data={data.rows}>
+                        <MainChartComponent data={data.rows}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                             <XAxis
                                 dataKey={chart.x_column}
@@ -278,7 +291,18 @@ export function DashboardChart({ chart, timeGrouping, startDate, endDate, classN
                                 name={chart.y_column}
                                 radius={[4, 4, 0, 0]}
                             />
-                        </ChartComponent>
+                            {isDual && (
+                                <DataComponent2
+                                    type="monotone"
+                                    dataKey={chart.y_column_2}
+                                    fill="#10b981"
+                                    stroke="#10b981"
+                                    strokeWidth={2}
+                                    name={chart.y_column_2}
+                                    radius={[4, 4, 0, 0]}
+                                />
+                            )}
+                        </MainChartComponent>
                     </ResponsiveContainer>
                 </div>
             </div>

@@ -16,6 +16,8 @@ class ChartConfig(BaseModel):
     chart_type: str # 'bar', 'line', 'area'
     x_column: str
     y_column: str
+    y_column_2: Optional[str] = None
+    chart_type_2: Optional[str] = 'line'
     date_column: Optional[str] = None
     breakdown_x_column: Optional[str] = None
     breakdown_chart_type: Optional[str] = 'bar'
@@ -28,6 +30,8 @@ class ChartConfigCreate(BaseModel):
     chart_type: str
     x_column: str
     y_column: str
+    y_column_2: Optional[str] = None
+    chart_type_2: Optional[str] = 'line'
     date_column: Optional[str] = None
     breakdown_x_column: Optional[str] = None
     breakdown_chart_type: Optional[str] = 'bar'

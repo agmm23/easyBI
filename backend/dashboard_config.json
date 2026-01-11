@@ -24,6 +24,21 @@
         "breakdown_x_column": "Branch",
         "breakdown_chart_type": "line",
         "id": "a2252bfb-eff4-48e0-a731-6c517e2a3091"
+      },
+      {
+        "title": "qweqweqwe",
+        "datasource_id": "5b04af55-12fb-438d-be4d-0e3088329a56",
+        "chart_type": "line",
+        "x_column": "Date",
+        "y_column": "Unit Price",
+        "y_column_2": "Units Sold",
+        "chart_type_2": "line",
+        "date_column": "Date",
+        "breakdown_x_column": null,
+        "breakdown_chart_type": "bar",
+        "breakdown_x_column_2": null,
+        "breakdown_chart_type_2": "bar",
+        "id": "8438d9d7-b78f-4d7c-8c8a-9b4c9136cd81"
       }
     ],
     "layout_columns": 2

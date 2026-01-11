@@ -12,7 +12,7 @@ export function Dashboard() {
     const { t } = useLanguage();
 
     // Date Range State
-    const [selectedRange, setSelectedRange] = useState('all');
+    const [selectedRange, setSelectedRange] = useState('last_month');
     const [customStart, setCustomStart] = useState('');
     const [customEnd, setCustomEnd] = useState('');
 

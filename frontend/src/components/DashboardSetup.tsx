@@ -17,6 +17,7 @@ export function DashboardSetup() {
     const [chartType, setChartType] = useState('bar');
     const [xColumn, setXColumn] = useState('');
     const [yColumn, setYColumn] = useState('');
+    const [yColumn2, setYColumn2] = useState('');
     const [dateColumn, setDateColumn] = useState('');
     const [availableColumns, setAvailableColumns] = useState<string[]>([]);
 
@@ -54,6 +55,7 @@ export function DashboardSetup() {
                     setDateColumn('');
                 }
                 setYColumn('');
+                setYColumn2('');
             }
         } else {
             setAvailableColumns([]);
@@ -109,6 +111,8 @@ export function DashboardSetup() {
                     chart_type: chartType,
                     x_column: xColumn,
                     y_column: yColumn,
+                    y_column_2: yColumn2 || null,
+                    chart_type_2: chartType,
                     date_column: dateColumn,
                     breakdown_x_column: breakdownColumn || null,
                     breakdown_chart_type: breakdownType,
@@ -121,6 +125,7 @@ export function DashboardSetup() {
                 setChartTitle('');
                 setSelectedSource('');
                 setBreakdownColumn('');
+                setYColumn2('');
                 setBreakdownColumn2('');
                 refreshSections();
             }
@@ -154,7 +159,7 @@ export function DashboardSetup() {
                             type="text"
                             value={newSectionTitle}
                             onChange={(e) => setNewSectionTitle(e.target.value)}
-                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border"
+                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border h-10"
                             placeholder="e.g. Sales, Operations"
                         />
                     </div>
@@ -163,7 +168,7 @@ export function DashboardSetup() {
                         <select
                             value={newSectionColumns}
                             onChange={(e) => setNewSectionColumns(Number(e.target.value))}
-                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white"
+                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border bg-white h-10"
                         >
                             <option value={1}>1 Chart (Full Width)</option>
                             <option value={2}>2 Charts (Half Width)</option>
@@ -251,13 +256,13 @@ export function DashboardSetup() {
                                         type="text"
                                         value={chartTitle}
                                         onChange={(e) => setChartTitle(e.target.value)}
-                                        className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border"
+                                        className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border h-10"
                                         placeholder="Chart Title"
                                     />
                                     <select
                                         value={selectedSource}
                                         onChange={(e) => setSelectedSource(e.target.value)}
-                                        className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border"
+                                        className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border h-10"
                                     >
                                         <option value="">Select Data Source...</option>
                                         {datasources.map(ds => (
@@ -267,7 +272,7 @@ export function DashboardSetup() {
                                     <select
                                         value={chartType}
                                         onChange={(e) => setChartType(e.target.value)}
-                                        className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border"
+                                        className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border h-10"
                                     >
                                         <option value="bar">Bar Chart</option>
                                         <option value="line">Line Chart</option>
@@ -277,7 +282,7 @@ export function DashboardSetup() {
                                         <select
                                             value={xColumn}
                                             onChange={(e) => setXColumn(e.target.value)}
-                                            className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border"
+                                            className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border h-10"
                                         >
                                             <option value="">X Axis...</option>
                                             {availableColumns.map(col => <option key={col} value={col}>{col}</option>)}
@@ -285,9 +290,19 @@ export function DashboardSetup() {
                                         <select
                                             value={yColumn}
                                             onChange={(e) => setYColumn(e.target.value)}
-                                            className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border"
+                                            className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border h-10"
                                         >
                                             <option value="">Y Axis...</option>
+                                            {availableColumns.map(col => <option key={col} value={col}>{col}</option>)}
+                                        </select>
+                                        {/* Spacer for X axis column */}
+                                        <div></div>
+                                        <select
+                                            value={yColumn2}
+                                            onChange={(e) => setYColumn2(e.target.value)}
+                                            className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm p-2 border h-10"
+                                        >
+                                            <option value="">Y Axis 2 (Optional)...</option>
                                             {availableColumns.map(col => <option key={col} value={col}>{col}</option>)}
                                         </select>
                                     </div>

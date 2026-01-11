@@ -86,6 +86,7 @@ def get_datasource_data(id: str,
                         sort_by: Optional[str] = None,
                         x_column: Optional[str] = None,
                         y_column: Optional[str] = None,
+                        y_column_2: Optional[str] = None,
                         breakdown_column: Optional[str] = None,
                         filter_column: Optional[str] = None,
                         filter_value: Optional[str] = None,
@@ -132,6 +133,10 @@ def get_datasource_data(id: str,
             try:
                  # Ensure Y column is numeric for summing
                  df[y_column] = pd.to_numeric(df[y_column], errors='coerce')
+                 y_cols = [y_column]
+                 if y_column_2 and y_column_2 in df.columns:
+                     df[y_column_2] = pd.to_numeric(df[y_column_2], errors='coerce')
+                     y_cols.append(y_column_2)
                  
                  # Handle Time Grouping
                  group_cols = [x_column]
@@ -152,7 +157,7 @@ def get_datasource_data(id: str,
                      group_cols.append(breakdown_column)
 
                  # Group by X (and breakdown) and sum Y, keeping columns as valid (as_index=False)
-                 df_grouped = df.groupby(group_cols, as_index=False)[y_column].sum()
+                 df_grouped = df.groupby(group_cols, as_index=False)[y_cols].sum()
                  
                  # --- ZERO FILLING LOGIC START ---
                  # Only apply if sorting by time or grouping by time is evident
