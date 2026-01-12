@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { useAuth } from './AuthContext';
 
 interface DashboardSection {
     id: string;
@@ -18,10 +19,12 @@ const DashboardContext = createContext<DashboardContextType | undefined>(undefin
 export function DashboardProvider({ children }: { children: ReactNode }) {
     const [sections, setSections] = useState<DashboardSection[]>([]);
     const [loading, setLoading] = useState(true);
+    const { authFetch, user } = useAuth();
 
     const fetchSections = () => {
+        if (!user) return;
         // setLoading(true); // Optional: depends if we want to show loading on every refresh
-        fetch('http://localhost:8000/api/dashboard-config/sections')
+        authFetch('http://localhost:8000/api/dashboard-config/sections')
             .then(res => res.json())
             .then(data => setSections(data))
             .catch(err => console.error(err))
@@ -29,8 +32,10 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     };
 
     useEffect(() => {
-        fetchSections();
-    }, []);
+        if (user) {
+            fetchSections();
+        }
+    }, [user]);
 
     return (
         <DashboardContext.Provider value={{ sections, loading, refreshSections: fetchSections }}>

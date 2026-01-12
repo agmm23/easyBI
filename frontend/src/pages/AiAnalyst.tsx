@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Database, Sparkles } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Message {
     role: 'user' | 'ai';
@@ -11,6 +12,7 @@ export function AiAnalyst() {
     const [datasources, setDatasources] = useState<any[]>([]);
     const [selectedSource, setSelectedSource] = useState('');
     const { t } = useLanguage();
+    const { authFetch } = useAuth();
     const [messages, setMessages] = useState<Message[]>([
         { role: 'ai', content: t('ai.subtitle') }
     ]);
@@ -30,7 +32,7 @@ export function AiAnalyst() {
     }, [t]);
 
     useEffect(() => {
-        fetch('http://localhost:8000/api/datasources/')
+        authFetch('http://localhost:8000/api/datasources/')
             .then(res => res.json())
             .then(data => {
                 setDatasources(data);
@@ -53,7 +55,7 @@ export function AiAnalyst() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:8000/api/ai/chat', {
+            const res = await authFetch('http://localhost:8000/api/ai/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

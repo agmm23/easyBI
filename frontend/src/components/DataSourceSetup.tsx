@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FileSpreadsheet, Database, Save, Trash2, Link } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export function DataSourceSetup() {
+    const { authFetch } = useAuth();
     const [uploading, setUploading] = useState(false);
     const [preview, setPreview] = useState<any>(null);
     const [uploadedFile, setUploadedFile] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export function DataSourceSetup() {
     }, []);
 
     const fetchDatasources = () => {
-        fetch('http://localhost:8000/api/datasources/')
+        authFetch('http://localhost:8000/api/datasources/')
             .then(res => res.json())
             .then(data => setDatasources(data))
             .catch(err => console.error(err));
@@ -38,7 +40,7 @@ export function DataSourceSetup() {
 
         setUploading(true);
         try {
-            const response = await fetch('http://localhost:8000/api/upload/', {
+            const response = await authFetch('http://localhost:8000/api/upload/', {
                 method: 'POST',
                 body: formData,
             });
@@ -59,7 +61,7 @@ export function DataSourceSetup() {
         if (!sheetUrl) return;
         setConnecting(true);
         try {
-            const response = await fetch('http://localhost:8000/api/datasources/preview-url', {
+            const response = await authFetch('http://localhost:8000/api/datasources/preview-url', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: sheetUrl, type: 'google_sheets' })
@@ -96,7 +98,7 @@ export function DataSourceSetup() {
                 columns: preview?.columns || []
             };
 
-            const response = await fetch('http://localhost:8000/api/datasources/', {
+            const response = await authFetch('http://localhost:8000/api/datasources/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -120,7 +122,7 @@ export function DataSourceSetup() {
     const handleDeleteSource = async (id: string) => {
         if (!confirm("Are you sure? This might break dashboard charts relying on this source.")) return;
         try {
-            await fetch(`http://localhost:8000/api/datasources/${id}`, { method: 'DELETE' });
+            await authFetch(`http://localhost:8000/api/datasources/${id}`, { method: 'DELETE' });
             fetchDatasources();
         } catch (err) { console.error(err) }
     };

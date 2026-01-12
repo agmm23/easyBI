@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Plus, Trash2, Layout, Settings, Grid, Square } from 'lucide-react';
 import { useDashboard } from '../contexts/DashboardContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export function DashboardSetup() {
     const [datasources, setDatasources] = useState<any[]>([]);
     const { sections, refreshSections } = useDashboard();
+    const { authFetch } = useAuth();
 
     // New Section State
     const [newSectionTitle, setNewSectionTitle] = useState('');
@@ -28,7 +30,7 @@ export function DashboardSetup() {
     const [breakdownType2, setBreakdownType2] = useState('bar');
 
     useEffect(() => {
-        fetch('http://localhost:8000/api/datasources/')
+        authFetch('http://localhost:8000/api/datasources/')
             .then(res => res.json())
             .then(data => setDatasources(data));
         // No need to fetch sections, context does it
@@ -65,7 +67,7 @@ export function DashboardSetup() {
     const handleCreateSection = async () => {
         if (!newSectionTitle) return;
         try {
-            const response = await fetch('http://localhost:8000/api/dashboard-config/sections', {
+            const response = await authFetch('http://localhost:8000/api/dashboard-config/sections', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -83,7 +85,7 @@ export function DashboardSetup() {
 
     const handleUpdateSectionLayout = async (sectionId: string, columns: number) => {
         try {
-            const response = await fetch(`http://localhost:8000/api/dashboard-config/sections/${sectionId}`, {
+            const response = await authFetch(`http://localhost:8000/api/dashboard-config/sections/${sectionId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -102,7 +104,7 @@ export function DashboardSetup() {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:8000/api/dashboard-config/sections/${sectionId}/charts`, {
+            const response = await authFetch(`http://localhost:8000/api/dashboard-config/sections/${sectionId}/charts`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -135,14 +137,14 @@ export function DashboardSetup() {
     const handleDeleteSection = async (id: string) => {
         if (!confirm("Are you sure you want to delete this section and all its charts?")) return;
         try {
-            await fetch(`http://localhost:8000/api/dashboard-config/sections/${id}`, { method: 'DELETE' });
+            await authFetch(`http://localhost:8000/api/dashboard-config/sections/${id}`, { method: 'DELETE' });
             refreshSections();
         } catch (err) { console.error(err); }
     };
 
     const handleDeleteChart = async (sectionId: string, chartId: string) => {
         try {
-            await fetch(`http://localhost:8000/api/dashboard-config/sections/${sectionId}/charts/${chartId}`, { method: 'DELETE' });
+            await authFetch(`http://localhost:8000/api/dashboard-config/sections/${sectionId}/charts/${chartId}`, { method: 'DELETE' });
             refreshSections();
         } catch (err) { console.error(err); }
     };

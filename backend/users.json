@@ -1,0 +1,21 @@
+{
+  "admin": {
+    "username": "admin",
+    "hashed_password": "$2b$12$grOXS5IFWRU0eSs5RGHozu8a3v6PXVF5eOP8FKDpxoN9IlZ.cb8jy",
+    "disabled": false
+  },
+  "qwer": {
+    "username": "qwer",
+    "email": "agmm2qweqwe3@gmail.com",
+    "full_name": "asdf",
+    "disabled": false,
+    "hashed_password": "$2b$12$sxUd2jjdm806PieLiUR4x.XW2T5lAGAWBdsrero9cPsOd/ktf4JZu"
+  },
+  "agmm23": {
+    "username": "agmm23",
+    "email": "agmm23@gmail.com",
+    "full_name": "Alfonso",
+    "disabled": false,
+    "hashed_password": "$2b$12$pZlfEe4XWkqe/P2Pwf3b5uZ5GcdQ6DofYVuAUbc2yc/tfEP5tOWka"
+  }
+}

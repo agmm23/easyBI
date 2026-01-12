@@ -1,12 +1,19 @@
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException, Body, Depends
 from pydantic import BaseModel
 from typing import List, Optional
 import json
 import os
+import shutil
+from app.auth_utils import get_current_active_user, User
 
 router = APIRouter(prefix="/api/datasources", tags=["datasources"])
 
-DB_FILE = "datasources.json"
+GLOBAL_DB_FILE = "datasources.json"
+
+def get_user_datasource_path(username: str):
+    user_dir = os.path.join("users", username)
+    os.makedirs(user_dir, exist_ok=True)
+    return os.path.join(user_dir, "datasources.json")
 
 class DataSource(BaseModel):
     id: str
@@ -29,40 +36,49 @@ class PreviewURLRequest(BaseModel):
     url: str
     type: str = "google_sheets"
 
-def load_db():
-    if not os.path.exists(DB_FILE):
+def load_db(user: User):
+    user_path = get_user_datasource_path(user.username)
+    
+    # Migration for Admin: Copy global file if user doesn't have one
+    if not os.path.exists(user_path):
+        if user.username == "admin" and os.path.exists(GLOBAL_DB_FILE):
+             shutil.copy(GLOBAL_DB_FILE, user_path)
+    
+    if not os.path.exists(user_path):
         return []
-    with open(DB_FILE, "r") as f:
+        
+    with open(user_path, "r") as f:
         try:
             return json.load(f)
         except json.JSONDecodeError:
             return []
 
-def save_db(data):
-    with open(DB_FILE, "w") as f:
+def save_db(data, user: User):
+    user_path = get_user_datasource_path(user.username)
+    with open(user_path, "w") as f:
         json.dump(data, f, indent=2)
 
 @router.get("/", response_model=List[DataSource])
-def get_datasources():
-    return load_db()
+def get_datasources(current_user: User = Depends(get_current_active_user)):
+    return load_db(current_user)
 
 @router.post("/", response_model=DataSource)
-def create_datasource(ds: DataSourceCreate):
-    db = load_db()
+def create_datasource(ds: DataSourceCreate, current_user: User = Depends(get_current_active_user)):
+    db = load_db(current_user)
     import uuid
     new_ds = ds.dict()
     new_ds["id"] = str(uuid.uuid4())
     db.append(new_ds)
-    save_db(db)
+    save_db(db, current_user)
     return new_ds
 
 @router.delete("/{id}")
-def delete_datasource(id: str):
-    db = load_db()
+def delete_datasource(id: str, current_user: User = Depends(get_current_active_user)):
+    db = load_db(current_user)
     new_db = [d for d in db if d["id"] != id]
     if len(db) == len(new_db):
         raise HTTPException(status_code=404, detail="Datasource not found")
-    save_db(new_db)
+    save_db(new_db, current_user)
     return {"message": "Datasource deleted"}
 
 from app.services.data_processing import process_file, get_full_data
@@ -80,6 +96,7 @@ def preview_url_datasource(request: PreviewURLRequest):
 
 @router.get("/{id}/data")
 def get_datasource_data(id: str, 
+                        current_user: User = Depends(get_current_active_user),
                         start_date: Optional[str] = None, 
                         end_date: Optional[str] = None, 
                         date_column: Optional[str] = None, 
@@ -91,7 +108,7 @@ def get_datasource_data(id: str,
                         filter_column: Optional[str] = None,
                         filter_value: Optional[str] = None,
                         group_by: Optional[str] = 'day'):
-    db = load_db()
+    db = load_db(current_user)
     ds = next((d for d in db if d["id"] == id), None)
     if not ds:
         raise HTTPException(status_code=404, detail="Datasource not found")

@@ -5,3 +5,10 @@ openpyxl
 python-multipart
 google-genai
 python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt==3.2.2
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+requests
